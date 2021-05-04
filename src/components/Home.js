@@ -16,8 +16,10 @@ const Home = () => {
     const [collapsed,setCollapsed]=React.useState(false);
     const [radioList,setRadioList]=React.useState([]);
     const [margin,setMargin]=React.useState('200px');
-    const [search,setSearch]=React.useState('');
-    const [apiURL,setapiURL]=React.useState('https://de1.api.radio-browser.info/json/stations/bycountry/india?limit=52&hidebroken==true');
+    const [search,setSearch]=React.useState('i');
+    const apiURL='https://de1.api.radio-browser.info/json/stations?limit=400&offset=1000';
+    // without limit it will get slow
+    const [filterParam,setFilterParam]=React.useState('country');
 
 
     const onSearch = event => setSearch(event.target.value);
@@ -26,9 +28,9 @@ const Home = () => {
     const handleClick=(e)=>{
       console.log('click',e);
       if (e.key==="1"){
-        setapiURL('https://de1.api.radio-browser.info/json/stations/bycountry/india?limit=52');
+        setFilterParam('country');
       }else{
-        setapiURL('https://de1.api.radio-browser.info/json/stations/bylanguage/english?limit=52')
+        setFilterParam('language')
       }
     }
 
@@ -41,7 +43,7 @@ const Home = () => {
     useEffect(() => {
       fetch(apiURL)
       .then(response=>response.json())
-      .then(data=>setRadioList(data));
+      .then(data=>{setRadioList(data);console.log(data);});
       console.log('set url')
     }, [apiURL])
 
@@ -91,8 +93,8 @@ const Home = () => {
           >
 
 
-<Input size="large" onChange={onSearch} allowClear style={{borderRadius:'1em',marginBottom:'2em',width:'90%',marginLeft:'auto',marginRight:'auto'}}placeholder="Search Station" prefix={<SearchOutlined />} />
-            {radioList.filter(radio=> radio.name.toLowerCase().includes(search.toLowerCase())).map((radio,v)=><RadioCard name={radio.name} key={v} language={radio.language} country={radio.country} votes={radio.votes} bitrate={radio.bitrate}/>)}
+            <Input size="large" onChange={onSearch} allowClear style={{borderRadius:'1em',marginBottom:'2em',width:'90%',marginLeft:'auto',marginRight:'auto'}}placeholder="Search Station" prefix={<SearchOutlined />} />
+            {radioList.filter(radio=> radio[filterParam].toLowerCase().includes(search.toLowerCase())).map((radio,v)=><RadioCard name={radio.name} key={v} language={radio.language} country={radio.country} votes={radio.votes} url={radio.url} bitrate={radio.bitrate}/>)}
             
           </Content>
         </Layout>
